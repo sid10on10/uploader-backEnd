@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 const multer = require('multer');
 const path = require('path');
+var mongodb = require("mongodb")
+var {url,mongodClient} = require("../config")
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -41,8 +44,9 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       let short = Math.random().toString(20).substr(2, 6);
       let shortURL = `http://localhost:5000/file/${short}`
       let fileUrl = `http://localhost:5000/${req.file.filename}`
+      let file_path = req.file.path
       await db.collection("files").insertOne({
-        short,shortURL,fileUrl,count:0,
+        short,shortURL,fileUrl,count:0,file_path
       })
       res.status(201).json({
           message: 'File uploded successfully',
