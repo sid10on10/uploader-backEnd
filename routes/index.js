@@ -42,11 +42,11 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       let db = client.db("uploader")
       console.log(req.file)
       let short = Math.random().toString(20).substr(2, 6);
-      let shortURL = `http://localhost:5000/file/${short}`
-      let fileUrl = `http://localhost:5000/${req.file.filename}`
+      let shortURL = `https://onetimeupload.herokuapp.com/file/${short}`
+      let fileUrl = `https://onetimeupload.herokuapp.com/${req.file.filename}`
       let file_path = req.file.path
       await db.collection("files").insertOne({
-        short,shortURL,fileUrl,count:0,file_path
+        short,shortURL,fileUrl,file_path
       })
       res.status(201).json({
           message: 'File uploded successfully',
