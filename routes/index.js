@@ -3,7 +3,7 @@ var router = express.Router();
 const multer = require('multer');
 const path = require('path');
 var mongodb = require("mongodb")
-var {url,mongodClient} = require("../config")
+var {url,mongodClient,project_path} = require("../config")
 
 
 /* GET home page. */
@@ -11,9 +11,11 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+const base_dir = project_path
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, './uploads');
+      cb(null, "./uploads");
   },
   filename: (req, file, cb) => {
       //console.log(file);
@@ -42,8 +44,8 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       let db = client.db("uploader")
       console.log(req.file)
       let short = Math.random().toString(20).substr(2, 6);
-      let shortURL = `https://18.222.144.69/file/${short}`
-      let fileUrl = `https://18.222.144.69/${req.file.filename}`
+      let shortURL = `https://onetimeupload.herokuapp.com/file/${short}`
+      let fileUrl = `https://onetimeupload.herokuapp.com/${req.file.filename}`
       let file_path = req.file.path
       await db.collection("files").insertOne({
         short,shortURL,fileUrl,file_path
