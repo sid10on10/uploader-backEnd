@@ -32,15 +32,25 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: fileFilter,limits: { fileSize: maxSize } });
 
 //Upload route
-router.post('/upload', upload.single('file'), (req, res, next) => {
+router.post('/upload', upload.single('file'), async (req, res, next) => {
+  let client;
   try {
+      client = await mongodClient.connect(url)
+      let db = client.db("uploader")
       console.log(req.file)
+      let short = Math.random().toString(20).substr(2, 6);
+      let shortURL = `http://localhost:5000/file/${short}`
+      let fileUrl = `http://localhost:5000/${req.file.filename}`
+      await db.collection("files").insertOne({
+        short,shortURL,fileUrl,count:0,
+      })
       res.status(201).json({
-          message: 'File uploded successfully'
+          message: 'File uploded successfully',
+          shorturl:shortURL
       });
   } catch (error) {
+      client.close()
       console.error(error);
-      res.json({message:error})
   }
 });
 
