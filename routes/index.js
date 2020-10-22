@@ -42,8 +42,8 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       let db = client.db("uploader")
       console.log(req.file)
       let short = Math.random().toString(20).substr(2, 6);
-      let shortURL = `https://3.23.59.237/file/${short}`
-      let fileUrl = `https://3.23.59.237/${req.file.filename}`
+      let shortURL = `https://18.222.144.69/file/${short}`
+      let fileUrl = `https://18.222.144.69/${req.file.filename}`
       let file_path = req.file.path
       await db.collection("files").insertOne({
         short,shortURL,fileUrl,file_path
