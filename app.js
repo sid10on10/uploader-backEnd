@@ -16,7 +16,7 @@ app.use(cors({
   origin:"*"
 }))
 
-app.use(express.static('uploads'))
+app.use(express.static(__dirname));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
