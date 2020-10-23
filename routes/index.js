@@ -70,7 +70,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       client = await mongodClient.connect(url)
       let db = client.db("uploader")
       let short = Math.random().toString(20).substr(2, 6);
-      let shortURL = `https://onetimeupload.herokuapp.com/${short}`
+      let shortURL = `https://onetimeupload.herokuapp.com/file/${short}`
       let fileUrl = req.file.location
       //console.log(fileUrl)
       await db.collection("files").insertOne({
