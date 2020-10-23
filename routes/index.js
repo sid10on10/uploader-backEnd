@@ -39,7 +39,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
   let client;
   try {
       console.log(req.file)
-      /*client = await mongodClient.connect(url)
+      client = await mongodClient.connect(url)
       let db = client.db("uploader")
       console.log(req.file)
       let short = Math.random().toString(20).substr(2, 6);
@@ -52,7 +52,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       res.status(201).json({
           message: 'File uploded successfully',
           shorturl:shortURL
-      });*/
+      });
   } catch (error) {
       client.close()
       console.error(error);
