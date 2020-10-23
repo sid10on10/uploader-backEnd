@@ -3,7 +3,7 @@ var router = express.Router();
 const multer = require('multer');
 const path = require('path');
 var mongodb = require("mongodb")
-var {url,mongodClient,project_path} = require("../config")
+var {url,mongodClient} = require("../config")
 
 
 /* GET home page. */
@@ -11,11 +11,9 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-const base_dir = project_path
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, "uploads");
+      cb(null, `../uploads`);
   },
   filename: (req, file, cb) => {
       //console.log(file);
@@ -40,7 +38,8 @@ const upload = multer({ storage: storage, fileFilter: fileFilter,limits: { fileS
 router.post('/upload', upload.single('file'), async (req, res, next) => {
   let client;
   try {
-      client = await mongodClient.connect(url)
+      console.log(req.file)
+      /*client = await mongodClient.connect(url)
       let db = client.db("uploader")
       console.log(req.file)
       let short = Math.random().toString(20).substr(2, 6);
@@ -53,7 +52,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       res.status(201).json({
           message: 'File uploded successfully',
           shorturl:shortURL
-      });
+      });*/
   } catch (error) {
       client.close()
       console.error(error);
