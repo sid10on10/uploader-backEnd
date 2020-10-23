@@ -53,7 +53,8 @@ const upload = multer({
       cb(null, { fieldName: "TESTING_DigiPrex" });
     },
     key: function (req, file, cb) {
-      cb(null, Date.now().toString());
+      const name = file.originalname.split(".")[0]
+      cb(null, name+"-"+Date.now() + path.extname(file.originalname));
     },
   }),
 });
