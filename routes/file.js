@@ -17,7 +17,7 @@ router.get('/:fileurl',async function(req,res,){
         await db.collection("files").findOneAndDelete({short})
         res.redirect(fileURL)
       }else{
-        res.json({message:"Invalid Url"})
+        res.render('index', { title: 'Invalid URL File Already Downloaded Once' });
       }
       
   }catch(error){
