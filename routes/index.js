@@ -15,18 +15,6 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-/*
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      cb(null, `../uploads`);
-  },
-  filename: (req, file, cb) => {
-      //console.log(file);
-      const name = file.originalname.split(".")[0]
-      cb(null, name+"-"+Date.now() + path.extname(file.originalname));
-  }
-});
-*/
 
 aws.config.update({
   secretAccessKey: process.env.S3_ACCESS_SECRET,
@@ -64,22 +52,27 @@ const upload = multer({
 //const upload = multer({ storage: storage, fileFilter: fileFilter});
 
 //Upload route
-router.post('/upload', upload.single('file'), async (req, res, next) => {
+router.post('/upload', upload.array('files'), async (req, res, next) => {
   let client;
   try {
-      console.log(req.file)
+      //console.log(req.files) -> array of files data
+      let files = req.files
       client = await mongodClient.connect(url)
       let db = client.db("uploader")
-      let short = Math.random().toString(20).substr(2, 6);
-      let shortURL = `https://onetimeupload.herokuapp.com/file/${short}`
-      let fileUrl = req.file.location
-      //console.log(fileUrl)
-      await db.collection("files").insertOne({
-        short,shortURL,fileUrl
-      })
+      let url_list = []
+      for(each_file of files){
+        let short = Math.random().toString(20).substr(2, 6);
+        let shortURL = `https://onetimeupload.herokuapp.com/file/${short}`
+        let fileUrl = each_file.location
+        let file_name = each_file.originalname
+        await db.collection("files").insertOne({
+          short,shortURL,fileUrl
+        })
+        url_list.push({file_name,shortURL})
+      }
       res.status(201).json({
           message: 'File uploded successfully',
-          shorturl:shortURL
+          url_list
       });
   } catch (error) {
       client.close()
