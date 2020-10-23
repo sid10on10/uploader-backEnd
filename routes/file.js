@@ -11,15 +11,11 @@ router.get('/:fileurl',async function(req,res,){
       let db = client.db("uploader")
       let short = req.params.fileurl
       let data = await db.collection("files").findOne({short})
+      console.log(data)
       if(data){
-        let filePath = data.file_path
+        let fileURL = data.fileUrl
         await db.collection("files").findOneAndDelete({short})
-        let base_dir = path.basename(__dirname)
-        const file = `./${filePath}`;
-        res.download(file)
-        /*fs.unlink(data.file_path, function() {
-            console.log("File deleted")    
-        });*/
+        res.redirect(fileURL)
       }else{
         res.json({message:"Invalid Url"})
       }

@@ -5,12 +5,17 @@ const path = require('path');
 var mongodb = require("mongodb")
 var {url,mongodClient} = require("../config")
 
+const aws = require("aws-sdk");
+const multerS3 = require("multer-s3");
+const s3 = new aws.S3();
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+/*
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
       cb(null, `../uploads`);
@@ -21,8 +26,13 @@ const storage = multer.diskStorage({
       cb(null, name+"-"+Date.now() + path.extname(file.originalname));
   }
 });
+*/
 
-const maxSize = 20971520
+aws.config.update({
+  secretAccessKey: process.env.S3_ACCESS_SECRET,
+  accessKeyId: process.env.S3_ACCESS_KEY,
+  region: "us-east-2",
+});
 
 const fileFilter = (req, file, cb) => {
   if (file) {
@@ -32,7 +42,25 @@ const fileFilter = (req, file, cb) => {
       cb(null, false);
   }
 }
-const upload = multer({ storage: storage, fileFilter: fileFilter,limits: { fileSize: maxSize } });
+
+const upload = multer({
+  fileFilter,
+  storage: multerS3({
+    acl: "public-read",
+    s3,
+    bucket: 'digiprex',
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: "TESTING_DigiPrex" });
+    },
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString());
+    },
+  }),
+});
+
+
+
+//const upload = multer({ storage: storage, fileFilter: fileFilter});
 
 //Upload route
 router.post('/upload', upload.single('file'), async (req, res, next) => {
@@ -41,13 +69,12 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       console.log(req.file)
       client = await mongodClient.connect(url)
       let db = client.db("uploader")
-      console.log(req.file)
       let short = Math.random().toString(20).substr(2, 6);
-      let shortURL = `https://onetimeupload.herokuapp.com/file/${short}`
-      let fileUrl = `https://onetimeupload.herokuapp.com/${req.file.filename}`
-      let file_path = req.file.path
+      let shortURL = `https://onetimeupload.herokuapp.com/${short}`
+      let fileUrl = req.file.location
+      //console.log(fileUrl)
       await db.collection("files").insertOne({
-        short,shortURL,fileUrl,file_path
+        short,shortURL,fileUrl
       })
       res.status(201).json({
           message: 'File uploded successfully',
