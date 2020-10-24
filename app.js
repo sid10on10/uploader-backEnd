@@ -12,9 +12,7 @@ var fileRouter = require('./routes/file');
 var app = express();
 
 //cors
-app.use(cors({
-  origin:"*"
-}))
+app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
